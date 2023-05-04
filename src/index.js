@@ -1,2 +1,2 @@
-export { Message } from './Message'
+export { MessageWrapper as Message } from './Message'
 export { useMessage } from './hook'

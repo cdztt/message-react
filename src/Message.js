@@ -1,4 +1,4 @@
-import { createContext, useEffect, useReducer, useRef, useState } from 'react'
+import { createContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import './message.css'
 
 // 等待多少毫秒
@@ -65,7 +65,7 @@ const OFFSET_BEFORE_HIDDEN = -20 // px
 
 export const MsgsDispatchContext = createContext()
 
-export function Message({ children }) {
+function Message({ children }) {
     const msgNodesRef = useRef([])
     const cursorRef = useRef(0)
     const [isHover, setIsHover] = useState(false)
@@ -75,7 +75,7 @@ export function Message({ children }) {
     const msgsRef = useRef(msgs)
 
     // 把state存入ref
-    useEffect(() => {
+    useLayoutEffect(() => {
         msgsRef.current = msgs
     }, [msgs])
 
@@ -103,7 +103,7 @@ export function Message({ children }) {
         const changeCss = cursor => {
             const msgNode = msgNodesRef.current[cursor]
             const msg = msgsRef.current[cursor]
-            if (!msgNode && !msg) {
+            if (!msgNode || !msg) {
                 return
             }
 
@@ -193,4 +193,18 @@ function msgsReducer(msgs, action) {
         case 'reset':
             return []
     }
+}
+
+export function MessageWrapper(props) {
+    const [showChild, setShowChild] = useState(false)
+
+    useEffect(() => {
+        setShowChild(true)
+    }, [])
+
+    if (!showChild) {
+        return null
+    }
+
+    return <Message {...props} />
 }
