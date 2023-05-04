@@ -1,4 +1,5 @@
 import { createContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'; // 不用createPortal大部分情况下也行，但这个文档说明了一些特殊情况https://vuejs.org/guide/built-ins/teleport.html#basic-usage，所以还是用
 import './message.css'
 
 // 等待多少毫秒
@@ -154,30 +155,32 @@ function Message({ children }) {
         }
     }, [])
 
+    const msgsNode = msgs.map(({
+        top,
+        content,
+        type,
+        fontSize
+    }, key) => {
+        return (
+            <div key={key}
+                style={{
+                    top: top + OFFSET_BEFORE_VISIBLE + 'px',
+                    color: colorEmoji[type].color,
+                    fontSize: fontSize + 'rem'
+                }}
+                className='message'
+                // 在render时把每条消息的引用都推到数组msgNodesRef.current
+                ref={node => msgNodesRef.current[key] = node}
+            >
+                {`${colorEmoji[type].emoji} ${content}`}
+            </div>
+        )
+    })
+
     return (
         <MsgsDispatchContext.Provider value={msgsDispatch}>
             {children}
-            {msgs.map(({
-                top,
-                content,
-                type,
-                fontSize
-            }, key) => {
-                return (
-                    <div key={key}
-                        style={{
-                            top: top + OFFSET_BEFORE_VISIBLE + 'px',
-                            color: colorEmoji[type].color,
-                            fontSize: fontSize + 'rem'
-                        }}
-                        className='message'
-                        // 在render时把每条消息的引用都推到数组msgNodesRef.current
-                        ref={node => msgNodesRef.current[key] = node}
-                    >
-                        {`${colorEmoji[type].emoji} ${content}`}
-                    </div>
-                )
-            })}
+            {createPortal(msgsNode, document.body)}
         </MsgsDispatchContext.Provider>
     )
 }
