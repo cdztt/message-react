@@ -4,7 +4,7 @@ import { MsgsDispatchContext } from './Message'
 const defaultMsg = {
     top: 100,
     duration: 1.5,
-    content: '请输入内容',
+    content: 'please enter',
     type: 'info',
     fontSize: 1
 }
