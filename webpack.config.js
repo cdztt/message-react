@@ -1,41 +1,41 @@
-const path = require('path')
+/* eslint-disable @typescript-eslint/no-var-requires */
+const path = require('path');
 
-module.exports = {
-    mode: 'production',
-    //devtool: 'inline-source-map',
-    entry: './src/index.js',
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js',
-        library: {
-            type: 'umd'
+module.exports = (env) => ({
+  mode: env.production ? 'production' : 'development',
+  devtool: env.production ? false : 'inline-source-map',
+  entry: './src/index',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'index.js',
+    library: {
+      type: 'umd',
+    },
+    globalObject: 'this',
+  },
+  externals: {
+    react: 'react',
+    'react-dom': 'react-dom',
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js'],
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+        options: {
+          // transpileOnly: env.production ? true : false,
+          configFile: '../tsconfig.json',
+          onlyCompileBundledFiles: true,
         },
-        globalObject: 'this'
-    },
-    externals: {
-        react: 'react'
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                loader: 'babel-loader',
-                options: {
-                    presets: [
-                        [
-                            '@babel/preset-react',
-                            { runtime: 'automatic' }
-                        ]
-                    ]
-                }
-            },
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            }
-        ]
-    },
-}
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
+});
